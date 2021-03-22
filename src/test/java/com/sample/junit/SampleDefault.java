@@ -14,12 +14,15 @@ public class SampleDefault {
     }
 
     @BeforeAll
-    public static void beforeAllTest() {
-        //[실행 우선순위 1] static method로 만들어야되고, @TestInstance가 선언되어 있어야 된다.
+    public  void beforeAllTest() {
+        System.out.println("beforeAllTest");
+        //[실행 우선순위 1] static method로 만들어야되고,
+        // @TestInstance가 선언되어 있어야 된다.
     }
 
     @BeforeEach
     public void beforeEachTest() {
+        System.out.println("beforeEachTest");
         //[실행 우선순위 2] 각 @Test Method가 실행되기 전 실행 된다.
         user = UserDto.builder().userId("Java").userName("World").build();
     }
@@ -28,6 +31,7 @@ public class SampleDefault {
     @Test
     @DisplayName("기본적인 테스트 메소드")
     void test1() {
+        System.out.println("기본적인 테스트 메소드");
         Assertions.assertEquals(1, 1);
     }
 
@@ -49,6 +53,17 @@ public class SampleDefault {
     void assertEqualsTest() {
         Assertions.assertEquals(user.getUserId(), "Java");
         Assertions.assertEquals(user.getUserName(), "World", "userName이 World가 아니다.");
+    }
+
+    void test_is_user_check() {
+        Assertions.assertEquals(1, 1);
+    }
+
+    @AfterAll
+    public static void afterAllTest() {
+        System.out.println("afterAllTest");
+        //[실행 우선순위 1] static method로 만들어야되고,
+        // @TestInstance(TestInstance.Lifecycle.PER_CLASS)가 선언되어 있어야 된다.
     }
 }
 
