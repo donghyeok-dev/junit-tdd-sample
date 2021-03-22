@@ -27,11 +27,11 @@ public class SampleDefault {
         user = UserDto.builder().userId("Java").userName("World").build();
     }
 
+    test
 
     @Test
     @DisplayName("기본적인 테스트 메소드")
     void test1() {
-        System.out.println("기본적인 테스트 메소드");
         Assertions.assertEquals(1, 1);
     }
 
