@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-public class DemoControllerTest {
+class DemoControllerTest {
 
     MockMvc mockMvc;
 
