@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 public class SampleRegisterExtension {
     /*@RegisterExtension
     static WebServerExtension server = WebServerExtension.builder()

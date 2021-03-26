@@ -3,7 +3,6 @@ package com.sample.junit;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = SampleTestMethodOrder.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SampleTestMethodOrder {
     @Test

@@ -3,7 +3,6 @@ package com.sample.junit;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes=SampleDisplayGeneration.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 public class SampleDisplayGeneration {
 

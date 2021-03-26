@@ -5,7 +5,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Objects;
 
-@SpringBootTest(classes = SampleRepeatTest.class)
 public class SampleRepeatTest {
 
     @RepeatedTest(3)

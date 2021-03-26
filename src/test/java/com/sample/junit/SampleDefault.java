@@ -4,7 +4,7 @@ import com.example.tdd1.UserDto;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = SampleDefault.class)
+//@SpringBootTest(classes = SampleDefault.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SampleDefault {
     UserDto user;
@@ -26,8 +26,6 @@ public class SampleDefault {
         //[실행 우선순위 2] 각 @Test Method가 실행되기 전 실행 된다.
         user = UserDto.builder().userId("Java").userName("World").build();
     }
-
-    test
 
     @Test
     @DisplayName("기본적인 테스트 메소드")
