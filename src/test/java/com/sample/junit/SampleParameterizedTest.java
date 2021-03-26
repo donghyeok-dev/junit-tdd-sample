@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Objects;
 
-@SpringBootTest(classes = SampleParameterizedTest.class)
 public class SampleParameterizedTest {
 
     @ParameterizedTest

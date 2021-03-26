@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.concurrent.TimeUnit;
 
-@SpringBootTest(classes = SampleTimout.class)
 public class SampleTimout {
 
     @Test

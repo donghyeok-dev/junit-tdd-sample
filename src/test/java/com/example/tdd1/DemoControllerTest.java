@@ -1,71 +1,103 @@
 package com.example.tdd1;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-@ExtendWith(SpringExtension.class)
-@WebAppConfiguration
+
+
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringJUnitWebConfig
+//@SpringBootTest
+@Slf4j
 class DemoControllerTest {
-
     MockMvc mockMvc;
-
+    ObjectMapper objectMapper;
 
     @BeforeEach
-    void setup(WebApplicationContext wac) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-
-      /*  mockMvc = standaloneSetup(new AccountController())
-                .defaultRequest(get("/")
-                        .contextPath("/app").servletPath("/main")
-                        .accept(MediaType.APPLICATION_JSON)).build();*/
+    void setUp(WebApplicationContext wac) {
+        this.objectMapper = new ObjectMapper();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new DemoController()) //@SpringBootTest 또는 @SpringJUnitWebConfig Annotation을 사용해야 된다.
+//        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)    //@SpringBootTest Annotation을 사용해야 된다.
+                //.defaultRequest(get("/checkName2")) //기본 요청 경로
+                //.alwaysExpect(status().isOk()) //모든 테스트 응답 결과가 200인지
+                .addFilter(new CharacterEncodingFilter("UTF-8", true)) //모든 테스트들의 MocMvc Response ContentType에 charset=UTF-8가 추가된다.(response 받은 정보에 한글이 깨져서 추가함), 부가적으로 스프링 부트 2.2.0 MediaType.APPLICATION_JSON_UTF8가 depreacted됨.
+//                .alwaysExpect(content().contentType("application/json;charset=UTF-8"))
+//                .alwaysExpect(content().contentType("text/plain;charset=ISO-8859-1"))
+                .build();
+//        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
-    @DisplayName("1")
     @Test
     void name() throws Exception {
-        mockMvc = standaloneSetup(new DemoController())
-                .defaultRequest(get("/checkName").accept(MediaType.APPLICATION_JSON))
-                .alwaysExpect(status().isOk())
-                .alwaysExpect(content().contentType("application/json;charset=UTF-8"))
+//        this.mockMvc.perform(multipart("/checkName").file("a1", "ABC".getBytes(StandardCharsets.UTF_8)));
+//        this.mockMvc.perform(get("/checkName?name={1}{2}{custom}{myself}{aaaaaaaa}", "kdh", "_A", "_B", "_C", "_D")); //name: kdh_A_B_C
+//        this.mockMvc.perform(get("/checkName").param("name", "kdh"));
+
+        DemoDto dto = DemoDto.builder()
+                .userId("test")
+                .userPassword("1234")
+                .userName("김동혁")
+                .age(39)
                 .build();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new DemoController())
-                .apply(sharedHttpSession())
-                .build();
+        log.info("TEST>> objectMapper.writeValueAsString(dto): " + objectMapper.writeValueAsString(dto));
 
-        // file upload requests
-        mockMvc.perform(multipart("/checkName").file("a1", "ABC".getBytes(StandardCharsets.UTF_8)));
+        //
+        this.mockMvc.perform(post("/postRequestObject")
+//                            .params(convertDto(objectMapper, dto))        //get 방식용
+                            .content(objectMapper.writeValueAsString(dto))  //post 용 ( writeValueAsString는 {"userId":"test","userPassword":"1234","userName":"김동혁"} 형식의 JSON String으로 변환해준다.)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .characterEncoding("UTF-8") )
+                    .andExpect(status().isOk())
+                    .andDo(print());
 
-        //URI template style
-        //URI 템플릿과 함께 제공된 쿼리 파라미터는 디코딩
-        mockMvc.perform(get("/checkName?name={myName}", "SuperMan"));
+        this.mockMvc.perform(post("/postRequestQueryString")
+                        .param("name", "동혁")
+                        .param("country", "대한민국")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .accept(MediaType.TEXT_PLAIN)
+                        .characterEncoding("UTF-8")
+//                        .accept(MediaType.APPLICATION_JSON) //accept는 client가 server에게 어떤형식(MediaType)으로 응답을 달라고 요청하는 것.
+                )
 
-        //Servlet request parameters
-        //요청 파라미터는 이미 디코딩된 것으로 예상된다는 점에 유의
-        mockMvc.perform(get("/hotels").param("name", "Jungle"));
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 
-        mockMvc.perform(get("/app/main/hotels").contextPath("/app").servletPath("/main"));
-
-
-        Assertions.assertEquals(1, 1);
-
+    public  MultiValueMap<String, String> convertDto(ObjectMapper objectMapper, Object dto) { // (2)
+        try {
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            Map<String, String> map = objectMapper.convertValue(dto, new TypeReference<Map<String, String>>() {}); // (3)
+            params.setAll(map); // (4)
+            return params;
+        } catch (Exception e) {
+            log.error("Url Parameter 변환중 오류가 발생했습니다. requestDto={}", dto, e);
+            throw new IllegalStateException("Url Parameter 변환중 오류가 발생했습니다.");
+        }
     }
 }

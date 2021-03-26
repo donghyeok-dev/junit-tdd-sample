@@ -4,7 +4,6 @@ import com.example.tdd1.UserDto;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = SpringBootTest.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SampleTags {
     UserDto user;

@@ -3,7 +3,6 @@ package com.sample.junit;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = SampleTestInstance.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SampleTestInstance {
     @BeforeAll

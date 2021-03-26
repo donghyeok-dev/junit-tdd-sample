@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = SampleExtendWith.class)
 @ExtendWith(Extendsion1.class)
 public class SampleExtendWith {
 

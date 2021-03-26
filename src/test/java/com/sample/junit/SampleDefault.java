@@ -4,7 +4,7 @@ import com.example.tdd1.UserDto;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(classes = SampleDefault.class)
+//@SpringBootTest(classes = SampleDefault.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SampleDefault {
     UserDto user;
