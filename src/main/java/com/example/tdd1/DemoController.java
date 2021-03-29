@@ -80,6 +80,7 @@ public class DemoController {
 
     @GetMapping("/requestGetDto")
     public DemoDto requestGetDto(DemoDto user) {
+        System.out.println(">> user: " + user);
         return user;
     }
 
