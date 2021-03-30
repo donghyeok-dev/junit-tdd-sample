@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
@@ -37,9 +34,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MockitoControllerTest {
     MockMvc mockMvc;
     ObjectMapper objectMapper;
+
+    @Mock
+    MockitoRepository mockitoRepository;
+
+    //@InjectMocks ??? 언제 쓰냐
     @Mock
     MockitoService mockitoService;
+    
     private AutoCloseable closeable;
+
+    @Captor
+    ArgumentCaptor<MockitoDto> captor;
 
     @BeforeAll
     public void openMocks() {
@@ -89,6 +95,9 @@ class MockitoControllerTest {
         resultList.add(dto);
         resultList.add(dto);
 
+        Mockito.when(this.mockitoRepository.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
+        Assertions.assertEquals(this.mockitoRepository.getDataList(dto), resultList);
+
 //        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
         Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).then(invocation -> {
             log.info("answer call!");
@@ -105,7 +114,7 @@ class MockitoControllerTest {
         resultActions.andExpect(status().isOk()); //http 상태코드 200(정상)인지 검사.
         resultActions.andExpect(jsonPath("$.[*].name", Matchers.everyItem(Matchers.notNullValue()))); //리턴 받은 json객체의 name필드 중 null값이 포함되어있는지 검사.
 
-        ArgumentCaptor<MockitoDto> captor = ArgumentCaptor.forClass(MockitoDto.class);
+        //ArgumentCaptor<MockitoDto> captor = ArgumentCaptor.forClass(MockitoDto.class);
         Mockito.verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
         Assertions.assertEquals(dto, captor.getValue());
 
