@@ -6,6 +6,7 @@ import lombok.*;
 @Setter
 @ToString
 @NoArgsConstructor
+@EqualsAndHashCode(of = {"name", "value1", "value2"})
 public class MockitoDto {
     private String name;
     private Integer value1;
@@ -17,4 +18,5 @@ public class MockitoDto {
         this.value1 = value1;
         this.value2 = value2;
     }
+
 }

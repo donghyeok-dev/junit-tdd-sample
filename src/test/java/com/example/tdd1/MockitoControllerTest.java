@@ -4,13 +4,14 @@ package com.example.tdd1;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,13 +21,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringJUnitWebConfig
@@ -36,11 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MockitoControllerTest {
     MockMvc mockMvc;
     ObjectMapper objectMapper;
-
-    private AutoCloseable closeable;
-
     @Mock
     MockitoService mockitoService;
+    private AutoCloseable closeable;
 
     @BeforeAll
     public void openMocks() {
@@ -79,18 +78,21 @@ class MockitoControllerTest {
     @DisplayName("Mockito Answer 테스트")
     void test2() throws Exception {
         //given
-        final int value1 = 3;
-        final int value2 = 5;
-
-        MockitoDto dto = MockitoDto.builder()
-                .value1(value1)
-                .value2(value2)
+        final MockitoDto dto = MockitoDto.builder()
+                .value1(2)
+                .value2(3)
                 .name("spring")
                 .build();
 
-        Mockito.when(this.mockitoService.getDataList(dto)).then(invocation -> {
-            log.info("Mockito answer test!");
-            return Collections.emptyList();
+        List<MockitoDto> resultList = new ArrayList<>();
+        resultList.add(dto);
+        resultList.add(dto);
+        resultList.add(dto);
+
+//        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
+        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).then(invocation -> {
+            log.info("answer call!");
+            return resultList;
         });
 
         //when
@@ -100,7 +102,22 @@ class MockitoControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
 
         //then
-        Mockito.verify(this.mockitoService, Mockito.times(1)).getDataList(dto);
+        resultActions.andExpect(status().isOk()); //http 상태코드 200(정상)인지 검사.
+        resultActions.andExpect(jsonPath("$.[*].name", Matchers.everyItem(Matchers.notNullValue()))); //리턴 받은 json객체의 name필드 중 null값이 포함되어있는지 검사.
+
+        ArgumentCaptor<MockitoDto> captor = ArgumentCaptor.forClass(MockitoDto.class);
+        Mockito.verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
+        Assertions.assertEquals(dto, captor.getValue());
+
+        /*
+            public static <T> T verify(T mock, VerificationMode mode)
+            public interface VerificationMode
+            public class VerificationModeFactory
+            public class Times implements VerificationInOrderMode, VerificationMode
+         */
+        Mockito.verify(this.mockitoService).getDataList(Mockito.isA(MockitoDto.class)); // 1번만 호출되었는지 검사
+        Mockito.verify(this.mockitoService, Mockito.times(1)).getDataList(Mockito.isA(MockitoDto.class)); // 지정된 호출횟수 만큼 호출되었는지 검사
+        Mockito.verify(this.mockitoService, Mockito.timeout(1)).getDataList(Mockito.isA(MockitoDto.class)); //비동기 코드를 테스트 시 지정된 시간 내에 메소드가 처리되는지
     }
 
     @AfterAll
@@ -111,7 +128,8 @@ class MockitoControllerTest {
     MultiValueMap<String, String> convertDtoToMultiValueMap(ObjectMapper objectMapper, Object dto) {
         try {
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.setAll(objectMapper.convertValue(dto, new TypeReference<Map<String, String>>() {}));
+            params.setAll(objectMapper.convertValue(dto, new TypeReference<Map<String, String>>() {
+            }));
             return params;
         } catch (Exception e) {
             log.error("Url Parameter 변환중 오류가 발생했습니다. requestDto={}", dto, e);
