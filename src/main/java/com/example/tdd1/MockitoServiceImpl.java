@@ -10,16 +10,17 @@ import java.util.List;
 @Slf4j
 public class MockitoServiceImpl implements MockitoService {
 
-    private final MockitoRepository mockitoRepository;
-
-    public MockitoServiceImpl(MockitoRepository mockitoRepository) {
-        this.mockitoRepository = mockitoRepository;
-    }
+//    private final MockitoRepository mockitoRepository;
+//
+//    public MockitoServiceImpl(MockitoRepository mockitoRepository) {
+//        this.mockitoRepository = mockitoRepository;
+//    }
 
     @Override
     public List<MockitoDto> getDataList(MockitoDto dto) {
         log.info("============= MockitoServiceImpl getDataList called!");
-        return mockitoRepository.getDataList(dto);
+        return Collections.emptyList();
+//        return mockitoRepository.getDataList(dto);
     }
 
     @Override

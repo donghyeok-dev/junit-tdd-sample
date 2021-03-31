@@ -11,9 +11,9 @@ import java.util.List;
 @Slf4j
 public class MockitoController {
 
-    private final MockitoServiceImpl mockitoService;
+    private final MockitoService mockitoService;
 
-    public MockitoController(MockitoServiceImpl mockitoService) {
+    public MockitoController(MockitoService mockitoService) {
         log.info(">>>>>>>>>>>>>>>>> DI mockitoService: " + mockitoService);
         this.mockitoService = mockitoService;
     }
@@ -25,6 +25,7 @@ public class MockitoController {
 
     @GetMapping("/example2")
     public List<MockitoDto> example2(MockitoDto dto) {
+        log.info(">>>>>>>>>>>>>>>>>>>> example2 getDataList called! dto: " + dto);
         return this.mockitoService.getDataList(dto);
     }
 }
