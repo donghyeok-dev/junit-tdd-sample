@@ -1,8 +1,14 @@
 package com.example.tdd1;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 import java.util.List;
 
-public class MockitoServiceImpl implements MockitoService{
+@Service
+@Slf4j
+public class MockitoServiceImpl implements MockitoService {
 
     private final MockitoRepository mockitoRepository;
 
@@ -12,6 +18,7 @@ public class MockitoServiceImpl implements MockitoService{
 
     @Override
     public List<MockitoDto> getDataList(MockitoDto dto) {
+        log.info("============= MockitoServiceImpl getDataList called!");
         return mockitoRepository.getDataList(dto);
     }
 

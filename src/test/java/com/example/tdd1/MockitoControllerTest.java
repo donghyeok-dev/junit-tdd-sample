@@ -19,6 +19,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,9 @@ class MockitoControllerTest {
     //@InjectMocks ??? 언제 쓰냐
     @Mock
     MockitoService mockitoService;
+
+    @InjectMocks
+    MockitoController mockitoController;
     
     private AutoCloseable closeable;
 
@@ -56,7 +60,7 @@ class MockitoControllerTest {
     void setUp() {
         this.objectMapper = new ObjectMapper();
         //this.mockitoService = mock(MockitoService.class);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new MockitoController(mockitoService))
+        this.mockMvc = MockMvcBuilders.standaloneSetup(mockitoController)
                 .alwaysDo(log())
                 .build();
     }
@@ -81,7 +85,7 @@ class MockitoControllerTest {
     }
 
     @Test
-    @DisplayName("Mockito Answer 테스트")
+    @DisplayName("Mockito 테스트 2")
     void test2() throws Exception {
         //given
         final MockitoDto dto = MockitoDto.builder()
@@ -90,19 +94,16 @@ class MockitoControllerTest {
                 .name("spring")
                 .build();
 
-        List<MockitoDto> resultList = new ArrayList<>();
-        resultList.add(dto);
-        resultList.add(dto);
-        resultList.add(dto);
+        List<MockitoDto> resultList = Arrays.asList(dto, dto, dto);
 
-        Mockito.when(this.mockitoRepository.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
-        Assertions.assertEquals(this.mockitoRepository.getDataList(dto), resultList);
+//        Mockito.when(this.mockitoRepository.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
+//        Assertions.assertEquals(this.mockitoRepository.getDataList(dto), resultList);
 
 //        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
-        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).then(invocation -> {
-            log.info("answer call!");
-            return resultList;
-        });
+//        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).then(invocation -> {
+//            log.info("answer call!");
+//            return resultList;
+//        });
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get("/example2")
@@ -115,8 +116,8 @@ class MockitoControllerTest {
         resultActions.andExpect(jsonPath("$.[*].name", Matchers.everyItem(Matchers.notNullValue()))); //리턴 받은 json객체의 name필드 중 null값이 포함되어있는지 검사.
 
         //ArgumentCaptor<MockitoDto> captor = ArgumentCaptor.forClass(MockitoDto.class);
-        Mockito.verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
-        Assertions.assertEquals(dto, captor.getValue());
+//        Mockito.verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
+//        Assertions.assertEquals(dto, captor.getValue());
 
         /*
             public static <T> T verify(T mock, VerificationMode mode)
