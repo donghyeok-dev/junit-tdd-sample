@@ -37,7 +37,14 @@ public class MockitoController {
 
     @GetMapping("/example3")
     public Integer example3(Integer value) {
-        Integer resultValue = testService.calculateValue(value);
+        Integer resultValue = testService.multiply(value);
+        log.info(">>>>>>>>>>> resultValue: " + resultValue);
+        return resultValue;
+    }
+
+    @GetMapping("/example4")
+    public Integer example4(Integer value)  {
+        Integer resultValue = testService.division(value);
         log.info(">>>>>>>>>>> resultValue: " + resultValue);
         return resultValue;
     }

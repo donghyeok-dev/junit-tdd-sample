@@ -3,11 +3,13 @@ package com.example.tdd1;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -35,8 +37,7 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,6 +54,9 @@ class MockitoControllerTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
+//
+//    @Rule
+//    public ExpectedException thrown = ExpectedException.none();
 
     MockMvc mockMvc;
     ObjectMapper objectMapper;
@@ -151,15 +155,69 @@ class MockitoControllerTest {
 
         final int value = 3;
 
+        //5번호출됨 (리턴값 1번 perform:10, 2번 perform: 10,  3번 perform: 10)
+//        when(this.testService.multiply(3)).thenReturn(10);
+//        when(this.testService.multiply(4)).thenReturn(11);
+//        when(this.testService.multiply(5)).thenReturn(12);
+//        when(this.testService.multiply(6)).thenReturn(13);
+//        when(this.testService.multiply(7)).thenReturn(14);
+
+        //0번호출 (리턴값 1번 perform:10, 2번 perform: 10,  3번 perform: 10)
+//        doReturn(10).when(this.testService).multiply(3);
+//        doReturn(11).when(this.testService).multiply(4);
+//        doReturn(12).when(this.testService).multiply(5);
+//        doReturn(13).when(this.testService).multiply(6);
+//        doReturn(14).when(this.testService).multiply(7);
+
+        //1번만 호출됨 (리턴값 1번 perform:14, 2번 perform: 14,  3번 perform: 14)
+//        when(this.testService.multiply(3)).thenReturn(10);
+//        when(this.testService.multiply(3)).thenReturn(11);
+//        when(this.testService.multiply(3)).thenReturn(12);
+//        when(this.testService.multiply(3)).thenReturn(13);
+//        when(this.testService.multiply(3)).thenReturn(14);
+        
+        //0번 호출 (리턴값 1번 perform:14, 2번 perform: 14,  3번 perform: 14)
+//        doReturn(10).when(this.testService).multiply(3);
+//        doReturn(11).when(this.testService).multiply(3);
+//        doReturn(12).when(this.testService).multiply(3);
+//        doReturn(13).when(this.testService).multiply(3);
+//        doReturn(14).when(this.testService).multiply(3);
+
+        //1번만 호출됨 (리턴값 1번 perform:10, 2번 perform: 11,  3번 perform: 12)
+//        when(this.testService.multiply(3)).thenReturn(10, 11, 12, 13, 14);
+
+        //0번 호출 (리턴값 1번 perform:10, 2번 perform: 11,  3번 perform: 12)
+        doReturn(10, 11, 12, 13, 14).when(this.testService).multiply(3);
+
+
         this.mockMvc.perform(get("/example3")
                 .param("value", String.valueOf(value)));
 
-//        when(this.testService.calculateValue(value)).thenReturn(10);
+        this.mockMvc.perform(get("/example3")
+                .param("value", String.valueOf(value)));
 
         this.mockMvc.perform(get("/example3")
                 .param("value", String.valueOf(value)));
 
-        Mockito.verify(this.testService, Mockito.times(2)).calculateValue(value);
+        Mockito.verify(this.testService, Mockito.times(3)).multiply(Mockito.isA(Integer.class));
+    }
+
+    @DisplayName("Mockito 테스트4")
+    void test4()  {
+
+        //1번만 호출됨 (리턴값 1번 perform:10, 2번 perform: 11,  3번 perform: 12)
+//        when(this.testService.division(10)).thenThrow(new RuntimeException());
+        //when(this.testService.division(0)).thenReturn(10, 11, 12, 13, 14);
+
+        //0번 호출 (리턴값 1번 perform:10, 2번 perform: 11,  3번 perform: 12)
+//        doReturn(10, 11, 12, 13, 14).when(this.testService).division(0);
+        doThrow(new RuntimeException("Aaaaaaaaaaaaaaaaaaaaaaaab")).when(this.testService).division(10);
+
+        this.mockMvc.perform(get("/example4")
+                .param("value", String.valueOf(10)))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof RuntimeException));
+
+//        Mockito.verify(this.testService, Mockito.times(3)).division(Mockito.isA(Integer.class));
     }
 
     MultiValueMap<String, String> convertDtoToMultiValueMap(ObjectMapper objectMapper, Object dto) {
