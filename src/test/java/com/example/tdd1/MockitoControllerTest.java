@@ -5,10 +5,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
+import org.junit.Rule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -29,7 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,18 +45,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringJUnitWebConfig
 //@SpringBootTest
 //@WebMvcTest
-@ExtendWith(MockitoExtension.class)
+//@MockitoSettings(strictness = Strictness.WARN)
+//@ExtendWith(MockitoExtension.class)
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-class MockitoControllerTest { /*extends BaseTest{*/
+class MockitoControllerTest {
+
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
+
     MockMvc mockMvc;
     ObjectMapper objectMapper;
 
     @Mock
     MockitoService mockitoService;
 
-//    @InjectMocks
-//    MockitoController mockitoController;
+    @Mock
+    TestService testService;
+
+    @InjectMocks
+    MockitoController mockitoController;
 
     @Captor
     ArgumentCaptor<MockitoDto> captor;
@@ -57,9 +72,8 @@ class MockitoControllerTest { /*extends BaseTest{*/
     @BeforeEach
     void setUp(WebApplicationContext wac) {
         this.objectMapper = new ObjectMapper();
-        this.mockitoService = mock(MockitoService.class);
 //        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new MockitoController(mockitoService))
+        this.mockMvc = MockMvcBuilders.standaloneSetup(mockitoController)
                 .alwaysDo(log())
                 .build();
     }
@@ -68,10 +82,10 @@ class MockitoControllerTest { /*extends BaseTest{*/
     @DisplayName("mockito 기본 테스트")
     void test1() throws Exception {
         //given
-        final int value1 = 3;
-        final int value2 = 5;
+        final Integer value1 = 3;
+        final Integer value2 = 5;
 
-        Mockito.when(this.mockitoService.calculateValue(value1, value2)).thenReturn(value1 * value2);
+        when(this.mockitoService.calculateValue(value1, value2)).thenReturn(value1 * value2);
 
         //when
         MvcResult mvcResult = this.mockMvc.perform(get("/example1")
@@ -98,13 +112,13 @@ class MockitoControllerTest { /*extends BaseTest{*/
 //        Mockito.when(this.mockitoRepository.getDataList(Mockito.isA(MockitoDto.class))).thenReturn(resultList);
 //        Assertions.assertEquals(this.mockitoRepository.getDataList(dto), resultList);
 
-        Mockito.when(this.mockitoService.getDataList(any())).thenReturn(resultList);
+        when(this.mockitoService.getDataList(any())).thenReturn(resultList);
 //        Mockito.when(this.mockitoService.getDataList(Mockito.isA(MockitoDto.class))).then(invocation -> {
 //            log.info("answer call!");
 //            return resultList;
 //        });
 
-        this.mockitoService.getDataList(any());
+//        this.mockitoService.getDataList(any());
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get("/example2")
@@ -116,9 +130,9 @@ class MockitoControllerTest { /*extends BaseTest{*/
         resultActions.andExpect(status().isOk()); //http 상태코드 200(정상)인지 검사.
         resultActions.andExpect(jsonPath("$.[*].name", Matchers.everyItem(Matchers.notNullValue()))); //리턴 받은 json객체의 name필드 중 null값이 포함되어있는지 검사.
         resultActions.andExpect(jsonPath("$.[*].name", Matchers.hasSize(3)));
-        //ArgumentCaptor<MockitoDto> captor = ArgumentCaptor.forClass(MockitoDto.class);
-//        Mockito.verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
-//        Assertions.assertEquals(dto, captor.getValue());
+//        ArgumentCaptor<MockitoDto> captor = ArgumentCaptor.forClass(MockitoDto.class);
+        Mockito.verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
+        Assertions.assertEquals(dto, captor.getValue());
 
         /*
             public static <T> T verify(T mock, VerificationMode mode)
@@ -126,9 +140,26 @@ class MockitoControllerTest { /*extends BaseTest{*/
             public class VerificationModeFactory
             public class Times implements VerificationInOrderMode, VerificationMode
          */
-//        Mockito.verify(this.mockitoService).getDataList(any()); // 1번만 호출되었는지 검사
-//        Mockito.verify(this.mockitoService, Mockito.times(1)).getDataList(Mockito.isA(MockitoDto.class)); // 지정된 호출횟수 만큼 호출되었는지 검사
+        Mockito.verify(this.mockitoService).getDataList(any()); // 1번만 호출되었는지 검사
+        Mockito.verify(this.mockitoService, Mockito.times(1)).getDataList(Mockito.isA(MockitoDto.class)); // 지정된 호출횟수 만큼 호출되었는지 검사
 //        Mockito.verify(this.mockitoService, Mockito.timeout(1)).getDataList(Mockito.isA(MockitoDto.class)); //비동기 코드를 테스트 시 지정된 시간 내에 메소드가 처리되는지
+    }
+
+    @Test
+    @DisplayName("Mockito 테스트3")
+    void test3() throws Exception {
+
+        final int value = 3;
+
+        this.mockMvc.perform(get("/example3")
+                .param("value", String.valueOf(value)));
+
+//        when(this.testService.calculateValue(value)).thenReturn(10);
+
+        this.mockMvc.perform(get("/example3")
+                .param("value", String.valueOf(value)));
+
+        Mockito.verify(this.testService, Mockito.times(2)).calculateValue(value);
     }
 
     MultiValueMap<String, String> convertDtoToMultiValueMap(ObjectMapper objectMapper, Object dto) {
