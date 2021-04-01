@@ -29,7 +29,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
+import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +69,7 @@ class MockitoControllerTest {
     @Mock
     MockitoService mockitoService;
 
-    @Mock
+    @Spy
     TestService testService;
 
     @InjectMocks
@@ -78,8 +83,24 @@ class MockitoControllerTest {
         this.objectMapper = new ObjectMapper();
 //        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
         this.mockMvc = MockMvcBuilders.standaloneSetup(mockitoController)
+                .setHandlerExceptionResolvers(withExceptionControllerAdvice())
                 .alwaysDo(log())
                 .build();
+    }
+
+    private ExceptionHandlerExceptionResolver withExceptionControllerAdvice() {
+        final ExceptionHandlerExceptionResolver exceptionResolver = new ExceptionHandlerExceptionResolver() {
+            @Override
+            protected ServletInvocableHandlerMethod getExceptionHandlerMethod(final HandlerMethod handlerMethod, final Exception exception) {
+                Method method = new ExceptionHandlerMethodResolver(TestAdvice.class).resolveMethod(exception);
+                if (method != null) {
+                    return new ServletInvocableHandlerMethod(new TestAdvice(), method);
+                }
+                return super.getExceptionHandlerMethod(handlerMethod, exception);
+            }
+        };
+        exceptionResolver.afterPropertiesSet();
+        return exceptionResolver;
     }
 
     @Test
@@ -150,7 +171,7 @@ class MockitoControllerTest {
     }
 
     @Test
-    @DisplayName("Mockito 테스트3")
+    @DisplayName("when doReturn 차이 테스트")
     void test3() throws Exception {
 
         final int value = 3;
@@ -191,33 +212,59 @@ class MockitoControllerTest {
 
 
         this.mockMvc.perform(get("/example3")
-                .param("value", String.valueOf(value)));
+                .param("value", String.valueOf(value))).andExpect(status().isOk());
 
         this.mockMvc.perform(get("/example3")
-                .param("value", String.valueOf(value)));
+                .param("value", String.valueOf(value))).andExpect(status().isOk());
 
         this.mockMvc.perform(get("/example3")
-                .param("value", String.valueOf(value)));
+                .param("value", String.valueOf(value))).andExpect(status().isOk());
 
         Mockito.verify(this.testService, Mockito.times(3)).multiply(Mockito.isA(Integer.class));
     }
 
-    @DisplayName("Mockito 테스트4")
+
+    @SneakyThrows
+    @Test
+    @DisplayName("Mockito Exception 테스트")
     void test4()  {
-
-        //1번만 호출됨 (리턴값 1번 perform:10, 2번 perform: 11,  3번 perform: 12)
-//        when(this.testService.division(10)).thenThrow(new RuntimeException());
-        //when(this.testService.division(0)).thenReturn(10, 11, 12, 13, 14);
-
-        //0번 호출 (리턴값 1번 perform:10, 2번 perform: 11,  3번 perform: 12)
-//        doReturn(10, 11, 12, 13, 14).when(this.testService).division(0);
-        doThrow(new RuntimeException("Aaaaaaaaaaaaaaaaaaaaaaaab")).when(this.testService).division(10);
+        //doThrow(new RuntimeException("aaaa")).when(this.testService).division(10);
+        //@Rule public ExpectedException expectedException = ExpectedException.none(); 앤 멀해주는걸까?
 
         this.mockMvc.perform(get("/example4")
-                .param("value", String.valueOf(10)))
-                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof RuntimeException));
+                .param("value", String.valueOf(0)))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof ArithmeticException))
+                .andReturn();
 
-//        Mockito.verify(this.testService, Mockito.times(3)).division(Mockito.isA(Integer.class));
+        Mockito.verify(this.testService, Mockito.times(1)).division(Mockito.isA(Integer.class));
+    }
+
+    @Test
+    @DisplayName("doXXX Method 테스트")
+    void test5() {
+        //https://stacktraceguru.com/unittest/mock-void-method#donothing_voidMethod
+
+        //메서드 호출을 무시한다.(내 추측인데 특정 메서드를 호출할때 그 내부에 포함된 메서드들 중 하나 이상을 무시하고 싶을때 사용하는 목적인 것 같다.)
+        /*
+        doNothing().when(mockedUserRepository).updateName(anyLong(),anyString());  // doNothintg()이 포함된 결과와 포함되지 않는 결과를 비교해보자.
+        userService.updateName(1L,"void mock test");
+        verify(mockedUserRepository, times(1)).updateName(1L,"void mock test");
+
+        //메서드 호출은 무시되지만 해당 메서드에 전달된 파라메터는 검사해볼수 있다. (오~~~)
+        ArgumentCaptor<Long> idCapture = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> nameCapture = ArgumentCaptor.forClass(String.class);
+        doNothing().when(mockedUserRepository).updateName(idCapture.capture(),nameCapture.capture());
+
+        userService.updateName(1L,"void mock test");
+
+        assertEquals(1L, idCapture.getValue());
+        assertEquals("void mock test", nameCapture.getValue());
+        */
+
+
+
+
+
     }
 
     MultiValueMap<String, String> convertDtoToMultiValueMap(ObjectMapper objectMapper, Object dto) {

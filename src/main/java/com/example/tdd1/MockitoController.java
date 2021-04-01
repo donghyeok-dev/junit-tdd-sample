@@ -46,6 +46,7 @@ public class MockitoController {
     public Integer example4(Integer value)  {
         Integer resultValue = testService.division(value);
         log.info(">>>>>>>>>>> resultValue: " + resultValue);
+
         return resultValue;
     }
 }
