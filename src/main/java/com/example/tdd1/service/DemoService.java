@@ -1,7 +1,6 @@
-package com.example.tdd1;
+package com.example.tdd1.service;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import com.example.tdd1.dto.UserDto;
 import org.springframework.stereotype.Service;
 
 

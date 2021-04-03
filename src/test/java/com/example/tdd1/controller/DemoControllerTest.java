@@ -1,5 +1,7 @@
-package com.example.tdd1;
+package com.example.tdd1.controller;
 
+import com.example.tdd1.controller.DemoController;
+import com.example.tdd1.dto.DemoDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

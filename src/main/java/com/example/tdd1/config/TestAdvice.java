@@ -1,4 +1,4 @@
-package com.example.tdd1;
+package com.example.tdd1.config;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;

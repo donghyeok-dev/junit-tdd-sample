@@ -1,5 +1,7 @@
-package com.example.tdd1;
+package com.example.tdd1.service.mockito;
 
+import com.example.tdd1.domain.User;
+import com.example.tdd1.dto.MockitoDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,11 @@ public class MockitoServiceImpl implements MockitoService {
 //    }
 
     @Override
+    public List<User> getUsers(MockitoDto dto) {
+        return null;
+    }
+
+    @Override
     public List<MockitoDto> getDataList(MockitoDto dto) {
         log.info("============= MockitoServiceImpl getDataList called!");
         return Collections.emptyList();
@@ -26,5 +33,11 @@ public class MockitoServiceImpl implements MockitoService {
     @Override
     public int calculateValue(int a, int b) {
         return 0;
+    }
+
+    @Override
+    public String getTeamName(String team) {
+        System.out.println(">>>>>>> getTeamName get call");
+        return team + " Team";
     }
 }

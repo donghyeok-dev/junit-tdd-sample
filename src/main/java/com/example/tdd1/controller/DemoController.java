@@ -1,5 +1,6 @@
-package com.example.tdd1;
+package com.example.tdd1.controller;
 
+import com.example.tdd1.dto.DemoDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;

@@ -1,8 +1,7 @@
 package com.sample.junit;
 
-import com.example.tdd1.UserDto;
+import com.example.tdd1.dto.UserDto;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.SpringBootTest;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SampleTags {

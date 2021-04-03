@@ -1,4 +1,4 @@
-package com.example.tdd1;
+package com.example.tdd1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

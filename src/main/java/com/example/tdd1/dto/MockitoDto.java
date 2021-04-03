@@ -1,4 +1,4 @@
-package com.example.tdd1;
+package com.example.tdd1.dto;
 
 import lombok.*;
 
