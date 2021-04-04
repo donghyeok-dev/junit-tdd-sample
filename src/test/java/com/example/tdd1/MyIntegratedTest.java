@@ -107,9 +107,10 @@ class MyIntegratedTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("통합테스트 update query")
     void testUpdateQuery()  {
-        UserDto user = UserDto.builder().userId("test1").userName("김태희").build();
+        UserDto user = UserDto.builder().userId("test1").userName("이나영").build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
