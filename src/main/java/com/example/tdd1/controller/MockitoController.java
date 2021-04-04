@@ -1,14 +1,23 @@
 package com.example.tdd1.controller;
 
+import com.example.tdd1.domain.User;
 import com.example.tdd1.dto.MockitoDto;
+import com.example.tdd1.dto.UserDto;
 import com.example.tdd1.service.MockBeanService;
 import com.example.tdd1.service.mockito.MockitoService;
 import com.example.tdd1.service.TestService;
+import jdk.jfr.ContentType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @Slf4j
@@ -27,6 +36,31 @@ public class MockitoController {
         this.testService = testService;
         this.mockBeanService = mockBeanService;
     }
+
+    @GetMapping("/selectUser")
+    public ResponseEntity<UserDto> selectUser(@RequestParam("userId") String userId) {
+        UserDto user = mockitoService.selectUser(userId);
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/updateUser", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public Boolean updateUser(@RequestBody UserDto user) {
+        return mockitoService.updateUser(user);
+    }
+
+    @GetMapping("/spybeanTest")
+    public String spybeanTest(HttpServletRequest request, String param) {
+        log.info(String.format(">>>> spybeanTest call! request: %s param: %s  ", request, param));
+        return this.mockitoService.getTeamName(param);
+    }
+
+    @GetMapping("/mockbeanTest")
+    public List<String> mockbeanTest(HttpServletRequest request, String param) {
+        log.info(String.format(">>>> mockbeanTest call! request: %s param: %s  ", request, param));
+        return this.mockBeanService.getSamples(param);
+    }
+
 
     @GetMapping("/example1")
     public Integer example1(Integer value1, Integer value2) {
@@ -71,9 +105,4 @@ public class MockitoController {
         return testService.dynamicSum(values);
     }
 
-    @GetMapping("/mockbeanTest")
-    public List<String> mockbeanTest(String param) {
-        log.info(">>>> mockbeanTest call!");
-        return this.mockBeanService.getSamples(param);
-    }
 }

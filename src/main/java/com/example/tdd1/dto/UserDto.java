@@ -1,11 +1,15 @@
 package com.example.tdd1.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.apache.ibatis.type.Alias;
 
+import java.io.Serializable;
+
+@Alias("UserDto")
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
 public class UserDto {
     private String userId;
     private String userName;

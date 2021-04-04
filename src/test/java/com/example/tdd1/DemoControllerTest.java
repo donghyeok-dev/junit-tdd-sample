@@ -1,4 +1,4 @@
-package com.example.tdd1.controller;
+package com.example.tdd1;
 
 import com.example.tdd1.controller.DemoController;
 import com.example.tdd1.dto.DemoDto;

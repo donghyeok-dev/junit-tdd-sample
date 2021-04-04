@@ -1,13 +1,14 @@
-package com.example.tdd1.controller;
+package com.example.tdd1;
 
 
+import com.example.tdd1.config.TestAdvice;
+import com.example.tdd1.controller.MockitoController;
 import com.example.tdd1.dto.MockitoDto;
 import com.example.tdd1.service.MockBeanService;
-import com.example.tdd1.service.mockito.MockitoService;
 import com.example.tdd1.service.TestService;
+import com.example.tdd1.service.mockito.MockitoService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.tdd1.config.TestAdvice;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
@@ -21,7 +22,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +37,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExc
 import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -50,14 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringJUnitWebConfig
-//@SpringBootTest
-//@WebMvcTest
-//@MockitoSettings(strictness = Strictness.WARN)
-//@ExtendWith(MockitoExtension.class)
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-class MockitoControllerTest {
-
+class MyStandaloneSetupTest {
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
 //
@@ -65,6 +60,7 @@ class MockitoControllerTest {
 //    public ExpectedException thrown = ExpectedException.none(); //앤 멀해주는걸까?
 
     MockMvc mockMvc;
+
     ObjectMapper objectMapper;
 
     @Mock
@@ -72,9 +68,6 @@ class MockitoControllerTest {
 
     @Spy
     TestService testService;
-
-    @MockBean
-    MockBeanService mockBeanService;
 
     @InjectMocks
     MockitoController mockitoController;
@@ -86,24 +79,11 @@ class MockitoControllerTest {
     void setUp(WebApplicationContext wac) {
 
         this.objectMapper = new ObjectMapper();
-//        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac)
+//        this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         this.mockMvc = MockMvcBuilders.standaloneSetup(mockitoController)
                 .setHandlerExceptionResolvers(withExceptionControllerAdvice())
                 .alwaysDo(log())
                 .build();
-    }
-
-    @Test
-    @DisplayName("MockBean 테스트")
-    void testMockbean() throws Exception {
-        final String param = "Nice";
-
-        when(this.mockBeanService.getSamples(anyString())).thenReturn(Arrays.asList("안녕", "만나서", "반가워"));
-
-//        System.out.println(">>> this.mockBeanService.getSamples: " + this.mockBeanService.getSamples(param));
-        this.mockMvc.perform(get("/mockbeanTest").param("param", param));
-
-        verify(this.mockBeanService).getSamples(param);
     }
 
     private ExceptionHandlerExceptionResolver withExceptionControllerAdvice() {
@@ -172,12 +152,12 @@ class MockitoControllerTest {
         verify(this.mockitoService).getDataList(captor.capture()); //호출된 메소드에 전달된 값 검증하기 (메소드 1번만 호출 허용)
         assertEquals(dto, captor.getValue());
 
-        /*
-            public static <T> T verify(T mock, VerificationMode mode)
-            public interface VerificationMode
-            public class VerificationModeFactory
-            public class Times implements VerificationInOrderMode, VerificationMode
-         */
+
+//            public static <T> T verify(T mock, VerificationMode mode)
+//            public interface VerificationMode
+//            public class VerificationModeFactory
+//            public class Times implements VerificationInOrderMode, VerificationMode
+
         verify(this.mockitoService).getDataList(any()); // 1번만 호출되었는지 검사
         verify(this.mockitoService, times(1)).getDataList(isA(MockitoDto.class)); // 지정된 호출횟수 만큼 호출되었는지 검사
 //        verify(this.mockitoService, timeout(1)).getDataList(isA(MockitoDto.class)); //비동기 코드를 테스트 시 지정된 시간 내에 메소드가 처리되는지
@@ -309,8 +289,6 @@ class MockitoControllerTest {
 
         verify(this.testService, times(1)).getTeamName("Spring");
     }
-
-
 
     MultiValueMap<String, String> convertDtoToMultiValueMap(ObjectMapper objectMapper, Object dto) {
         try {

@@ -2,6 +2,8 @@ package com.example.tdd1.service.mockito;
 
 import com.example.tdd1.domain.User;
 import com.example.tdd1.dto.MockitoDto;
+import com.example.tdd1.dto.UserDto;
+import com.example.tdd1.mybatis.TestMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +14,25 @@ import java.util.List;
 @Slf4j
 public class MockitoServiceImpl implements MockitoService {
 
+    private final TestMapper testMapper;
+
+    public MockitoServiceImpl(TestMapper testMapper) {
+        this.testMapper = testMapper;
+    }
 //    private final MockitoRepository mockitoRepository;
 //
 //    public MockitoServiceImpl(MockitoRepository mockitoRepository) {
 //        this.mockitoRepository = mockitoRepository;
 //    }
+    @Override
+    public UserDto selectUser(String userId) {
+        return this.testMapper.selectUser(userId);
+    }
 
+    @Override
+    public boolean updateUser(UserDto dto) {
+        return this.testMapper.updateUser(dto) > 0;
+    }
     @Override
     public List<User> getUsers(MockitoDto dto) {
         return null;
