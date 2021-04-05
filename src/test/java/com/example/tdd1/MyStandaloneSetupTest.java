@@ -290,6 +290,20 @@ class MyStandaloneSetupTest {
         verify(this.testService, times(1)).getTeamName("Spring");
     }
 
+    @Test
+    @DisplayName("InOrder 테스트")
+    void testInOrder() {
+        this.testService.multiply(3);
+        this.testService.multiply(4);
+        this.testService.multiply(5);
+
+        //순서대로 호출 되는지 검증
+        InOrder inOrder =  inOrder(this.testService);
+        inOrder.verify(this.testService).multiply(3);
+        inOrder.verify(this.testService).multiply(4);
+        inOrder.verify(this.testService).multiply(5);
+    }
+
     MultiValueMap<String, String> convertDtoToMultiValueMap(ObjectMapper objectMapper, Object dto) {
         try {
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

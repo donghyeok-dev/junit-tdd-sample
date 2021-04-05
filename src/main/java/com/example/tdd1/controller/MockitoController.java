@@ -22,7 +22,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @Slf4j
 public class MockitoController {
-
     private final MockitoService mockitoService;
     private final TestService testService;
     private final MockBeanService mockBeanService;
