@@ -1,6 +1,8 @@
 package com.example.tdd1.controller;
 
 import com.example.tdd1.dto.Dollar;
+import com.example.tdd1.dto.Franc;
+import com.example.tdd1.dto.Money;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
@@ -20,25 +22,49 @@ class TddControllerTest {
 
     TddController tddController;
 
-    @Test
-    @DisplayName("Tdd 컨트롤러를 생성한다.")
-    void createController() {
-         this.tddController = new TddController();
-        log.info(">>> " + this.tddController.getExchangeRate());
-    }
+//    @Test
+//    @DisplayName("Tdd 컨트롤러를 생성한다.")
+//    void createController() {
+//         this.tddController = new TddController();
+//        log.info(">>> " + this.tddController.getExchangeRate());
+//    }
 
     @Test
     @DisplayName("")
     void testMultiplication() {
-        Dollar five = new Dollar(5);
-        assertEquals(new Dollar(10), five.times(2));
-        assertEquals(new Dollar(15), five.times(3));
+        Money five = Money.dollar(5);
+        assertEquals(Money.dollar(10), five.times(2));
+        assertEquals(Money.dollar(15), five.times(3));
     }
 
     @Test
     @DisplayName("")
-    void test2() {
-        assertTrue(new Dollar(5).equals(new Dollar(5)));
-        assertFalse(new Dollar(5).equals(new Dollar(6)));
+    void testFrancMultiplication() {
+        Franc five = Money.franc(5);
+        assertEquals(Money.franc(10), five.times(2));
+        assertEquals(Money.franc(15), five.times(3));
+    }
+
+    @Test
+    @DisplayName("")
+    void testEquality() {
+        assertEquals(Money.dollar(5), Money.dollar(5));
+        assertNotEquals(Money.dollar(6), Money.dollar(5));
+        assertEquals(Money.franc(5), Money.franc(5));
+        assertNotEquals(Money.franc(6), Money.franc(5));
+        assertNotEquals(Money.franc(5), Money.dollar(5));
+    }
+
+    @Test
+    @DisplayName("")
+    void testCurrency() {
+        assertEquals("USD", Money.dollar(1).currency());
+        assertEquals("CHF", Money.franc(1).currency());
+    }
+
+    @Test
+    @DisplayName("")
+    void testDifferentClassEquality() {
+        assertEquals(new Money(10, "CHF"), new Franc(10, "CHF"));
     }
 }
