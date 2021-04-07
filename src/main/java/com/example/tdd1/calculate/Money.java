@@ -1,4 +1,4 @@
-package com.example.tdd1.dto;
+package com.example.tdd1.calculate;
 
 import java.util.Objects;
 
@@ -11,10 +11,16 @@ public class Money implements Expression{
         this.currency = currency;
     }
 
-    public Expression plus(Money addend) {
+    public Money reduce(Bank bank, String to) {
+        int rate = bank.rate(currency, to);
+        return new Money(amount /  rate, to);
+    }
+
+    public Expression plus(Expression addend) {
         return new Sum(this, addend);
     }
-    public Money times(int multiplier) {
+
+    public Expression times(int multiplier) {
         return new Money(amount * multiplier, currency);
     }
 

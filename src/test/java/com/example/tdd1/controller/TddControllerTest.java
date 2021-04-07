@@ -1,9 +1,9 @@
 package com.example.tdd1.controller;
 
-import com.example.tdd1.dto.Bank;
-import com.example.tdd1.dto.Expression;
-import com.example.tdd1.dto.Money;
-import com.example.tdd1.dto.Sum;
+import com.example.tdd1.calculate.Bank;
+import com.example.tdd1.calculate.Expression;
+import com.example.tdd1.calculate.Money;
+import com.example.tdd1.calculate.Sum;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Rule;
 import org.junit.jupiter.api.DisplayName;
@@ -62,27 +62,6 @@ class TddControllerTest {
 
     @Test
     @DisplayName("")
-    void testSimpleAddition() {
-        Money five = Money.dollar(5);
-        Expression sum = five.plus(five);
-        Bank bank = new Bank();
-        Money reduced = bank.reduce(sum, "USB");
-
-//        assertEquals(Money.dollar(10), reduced);
-    }
-
-    @Test
-    @DisplayName("")
-    void testPlusReturnsSum() {
-        Money five = Money.dollar(5);
-        Expression result = five.plus(five);
-        Sum sum = (Sum) result;
-//        assertEquals(five, sum.augend);
-//        assertEquals(five, sum.addend);
-    }
-
-    @Test
-    @DisplayName("")
     void testReduceSum() {
         Expression sum = new Sum(Money.dollar(3), Money.dollar(4));
         Bank bank = new Bank();
@@ -94,7 +73,45 @@ class TddControllerTest {
     @DisplayName("")
     public void testReduceMoney() {
         Bank bank = new Bank();
-        Money result = bank.reduce(Money.dollar(1), "USD");
+        bank.addRate("CHF", "USD", 2);
+        Money result = bank.reduce(Money.franc(2), "USD");
         assertEquals(Money.dollar(1), result);
     }
+
+    @Test
+    @DisplayName("")
+    void testIdentityRate() {
+        assertEquals(1, new Bank().rate("USD", "USD"));
+    }
+
+    @Test
+    @DisplayName("")
+    void testMixedAddition() {
+        Expression fiveBucks = Money.dollar(5);
+        Expression tenFrancs = Money.franc(10);
+        Bank bank = new Bank();
+        bank.addRate("CHF", "USD", 2);
+        Money result = bank.reduce(fiveBucks.plus(tenFrancs), "USD");
+        assertEquals(Money.dollar(10), result);
+    }
+
+    @Test
+    @DisplayName("")
+    void testSumplusMoney() {
+        Expression fiveBucks = Money.dollar(5);
+        Expression tenFrancs = Money.franc(10);
+        Bank bank = new Bank();
+        bank.addRate("CHF", "USD", 2);
+        Expression sum = new Sum(fiveBucks, tenFrancs).plus(fiveBucks);
+        Money result = bank.reduce(sum, "USD");
+
+        assertEquals(Money.dollar(15), result);
+    }
+
+//    @Test
+//    @DisplayName("")
+//    void testPlusSameCurrencyReturnsMoney() {
+//        Expression sum = Money.dollar(1).plus(Money.dollar(1));
+//        assertTrue(sum instanceof Money);
+//    }
 }
