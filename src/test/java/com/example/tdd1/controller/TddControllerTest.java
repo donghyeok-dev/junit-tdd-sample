@@ -98,20 +98,17 @@ class TddControllerTest {
     @Test
     @DisplayName("")
     void testSumplusMoney() {
-        Expression fiveBucks = Money.dollar(5);
-        Expression tenFrancs = Money.franc(10);
         Bank bank = new Bank();
         bank.addRate("CHF", "USD", 2);
-        Expression sum = new Sum(fiveBucks, tenFrancs).plus(fiveBucks);
+        Expression sum = Money.dollar(5)
+                .plus(Money.franc(10))
+                .plus(Money.dollar(5))
+                .plus(Money.dollar(5))
+                .minus(Money.dollar(15))
+                .multiply(Money.dollar(2));
+
         Money result = bank.reduce(sum, "USD");
 
-        assertEquals(Money.dollar(15), result);
+        assertEquals(Money.dollar(10), result);
     }
-
-//    @Test
-//    @DisplayName("")
-//    void testPlusSameCurrencyReturnsMoney() {
-//        Expression sum = Money.dollar(1).plus(Money.dollar(1));
-//        assertTrue(sum instanceof Money);
-//    }
 }

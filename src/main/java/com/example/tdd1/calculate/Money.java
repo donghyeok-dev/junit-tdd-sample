@@ -6,7 +6,7 @@ public class Money implements Expression{
     protected int amount;
     protected String currency;
 
-    public Money(int amount, String currency) {
+    protected Money(int amount, String currency) {
         this.amount = amount;
         this.currency = currency;
     }
@@ -18,6 +18,15 @@ public class Money implements Expression{
 
     public Expression plus(Expression addend) {
         return new Sum(this, addend);
+    }
+
+    @Override
+    public Expression minus(Expression addend) {
+        return new Minus(this, addend);
+    }
+
+    public Expression multiply(Expression multiplier) {
+        return new Multiply(this, multiplier);
     }
 
     public Expression times(int multiplier) {
