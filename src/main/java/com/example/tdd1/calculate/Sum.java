@@ -1,6 +1,6 @@
 package com.example.tdd1.calculate;
 
-public class Sum implements Expression{
+public class Sum implements Expression {
     Expression augend;
     Expression addend;
 
