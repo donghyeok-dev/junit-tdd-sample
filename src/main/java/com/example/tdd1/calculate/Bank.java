@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class Bank {
-    private  HashMap<Pair, Integer> rates = new LinkedHashMap<>();
+    private HashMap<Pair, Integer> rates = new LinkedHashMap<>();
 
     public void addRate(String from, String to, Integer rate) {
         rates.put(new Pair(from, to), rate);
