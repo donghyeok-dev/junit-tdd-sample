@@ -1,6 +1,6 @@
 package com.sample.junit;
 
-import com.example.tdd1.dto.UserDto;
+import com.example.tdd1.basic.dto.UserDto;
 import org.junit.jupiter.api.*;
 
 //@SpringBootTest(classes = SampleDefault.class)
