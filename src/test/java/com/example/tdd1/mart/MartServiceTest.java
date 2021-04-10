@@ -32,6 +32,7 @@ class MartServiceTest {
         assertNotEquals(apple, banana);
 
         assertEquals(apple3, apple.add(apple));
+        assertEquals(apple.add(apple), apple3);
         assertEquals(apple3, apple.add(apple2));
         assertNotEquals(apple3, apple.add(banana));
     }

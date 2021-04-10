@@ -5,9 +5,11 @@ import com.example.tdd1.mart.part.Cart;
 import com.example.tdd1.mart.product.Product;
 import com.example.tdd1.mart.product.ProductPrice;
 import com.example.tdd1.mart.product.ProductType;
+import lombok.Getter;
 
 import java.util.Objects;
 
+@Getter
 public class Food implements Product {
     private final int count;
     private final ProductType type;
