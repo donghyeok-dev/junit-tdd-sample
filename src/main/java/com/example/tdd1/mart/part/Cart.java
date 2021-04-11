@@ -6,6 +6,7 @@ import com.example.tdd1.mart.product.ProductType;
 import com.example.tdd1.mart.product.food.Food;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 
 import java.util.Objects;
 

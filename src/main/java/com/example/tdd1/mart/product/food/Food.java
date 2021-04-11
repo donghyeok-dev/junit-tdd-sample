@@ -6,6 +6,7 @@ import com.example.tdd1.mart.product.Product;
 import com.example.tdd1.mart.product.ProductPrice;
 import com.example.tdd1.mart.product.ProductType;
 import lombok.Getter;
+import org.springframework.util.Assert;
 
 import java.util.Objects;
 
@@ -19,6 +20,9 @@ public class Food implements Product {
         this.type = type;
     }
 
+    protected boolean vaildCount(int count) {
+        return count < 1;
+    }
     @Override
     public Product add(Product to) {
         return new Cart(this, to);

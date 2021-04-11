@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public enum MeetType implements ProductType {
+public enum MeatType implements ProductType {
     BEEF(11, "소고기"),
     PORK(12, "돼지고기"),
     CHICKEN(13, "닭고기"),
@@ -15,7 +15,7 @@ public enum MeetType implements ProductType {
     private int code;
     private String name;
 
-    MeetType(int code, String name) {
+    MeatType(int code, String name) {
         this.code = code;
         this.name = name;
     }

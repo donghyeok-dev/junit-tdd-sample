@@ -5,13 +5,12 @@ import com.example.tdd1.mart.part.Money;
 import com.example.tdd1.mart.part.Response;
 import com.example.tdd1.mart.product.Product;
 import com.example.tdd1.mart.product.ProductPrice;
-import com.example.tdd1.mart.product.food.Dairy;
-import com.example.tdd1.mart.product.food.Fruit;
-import com.example.tdd1.mart.product.food.FruitType;
-import com.example.tdd1.mart.product.food.Meat;
+import com.example.tdd1.mart.product.food.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,11 +51,20 @@ class MartServiceTest {
     }
 
     @Test
-    @DisplayName("상품코드 체크")
+    @DisplayName("상품코드 금액 체크")
     void check_productType() {
         ProductPrice productPrice = new ProductPrice();
 
         assertEquals(2000, productPrice.getProductPrice(FruitType.APPLE));
+        assertEquals(10000, productPrice.getProductPrice(MeatType.BEEF));
+    }
+
+    @Test
+    @DisplayName("상품 개수가 올바르지 않으면 예외가 발생한다.")
+    void if_invalid_product_amount_occur_exception() {
+        assertThrows(IllegalArgumentException.class, () -> Fruit.apple(0));
+        assertThrows(IllegalArgumentException.class, () -> Meat.beef(-1));
+        assertThrows(IllegalArgumentException.class, () -> Dairy.milk(-10000));
     }
 
     @Test
