@@ -5,6 +5,9 @@ import com.example.tdd1.mart.product.ProductPrice;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
+
+import java.util.Queue;
 
 @Getter
 @NoArgsConstructor
@@ -17,20 +20,13 @@ public class Cashier {
     }
 
     public Response checkOut(Product product, Money pay) {
-
-        if(product == null) {
-            throw new RuntimeException("계산할 상품이 없습니다.");
-        }
+        Assert.notNull(product, "계산할 상품이 없습니다.");
 
         ProductPrice productPrice = new ProductPrice();
-
         CalulateResult result = product.calculate(productPrice);
 
         int change = pay.amount - result.getAmount(); //거스름돈
-
-        if(change < 0) {
-            throw new RuntimeException("잔액이 부족합니다.");
-        }
+        Assert.isTrue(change > 0, "잔액이 부족합니다.");
 
         return Response.builder()
                 .cashierName(this.getCashierName())
